@@ -6,11 +6,12 @@ export enum BirdEnum {
   HUISZWALUM = 'Huiszwaluw',
   HUISMUS = 'Huismus',
   SPREEUW = 'Spreeuw',
+  OTHER = 'Overig'
 }
 
 export type Bird = {
   geometry: {
-    coordinates: LngLatLike[],
+    coordinates: LngLatLike,
   },
   id: number,
   properties: {

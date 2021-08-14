@@ -3,11 +3,18 @@
   <p v-if="fetchingBirds">De vogels worden geladen...</p>
   <p v-else-if="fetchBirdsFailed">Er is een fout opgetreden</p>
   <div v-else>
-    <div v-for="(birds, name) in birdsByType" :key=name>
-      <input type="checkbox" :id="name"/>
-      <label :for="name">{{ name }} ( {{ birds.length }} )</label>
+    <div v-for="(item, name) in birdsByType" :key=name class="flex-box">
+      <input
+        type="radio"
+        :id="name"
+        name="birds"
+        v-model="selected"
+        v-bind:value="name"
+      />
+      <label :for="name">{{ name }} ( {{ item.birds.length }} )</label>
+      <div :style="`background-color: ${item.color}`" class="color-box"></div>
     </div>
-    <input type="checkbox" id="total-birds"/>
+    <input type="radio" id="total-birds" name="birds"/>
     <label for="total-birds">Alle vogels {{ `${birds.length}` }} </label>
   </div>
   </div>
@@ -19,7 +26,15 @@ import { mapActions, mapState } from 'vuex'
 export default {
   name: 'Birds',
   computed: {
-    ...mapState(['birds', 'typeOfBirds', 'fetchingBirds', 'fetchBirdsFailed', 'birdsByType']),
+    ...mapState(['birds', 'typeOfBirds', 'fetchingBirds', 'fetchBirdsFailed', 'birdsByType', 'selectedBird']),
+    selected: {
+      get () {
+        return this.selectedBird
+      },
+      set (value) {
+        this.$store.commit('selectionUpdated', value)
+      },
+    },
   },
   mounted () {
     this.fetchBirds()
@@ -29,3 +44,16 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.color-box {
+  margin-left: 5px;
+  width: 13px;
+  height: 13px;
+}
+.flex-box {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+</style>
