@@ -1,7 +1,8 @@
 <template>
 <div>
-  <h1>Map</h1>
-  <div id="map" class="map"></div>
+  <div class="map-wrapper">
+    <div id="map" class="map"></div>
+  </div>
 </div>
 </template>
 
@@ -19,13 +20,14 @@ export default Vue.extend({
   },
   mounted () {
     mapboxgl.accessToken = this.accessToken
-    // eslint-disable-next-line
-    new mapboxgl.Map({
+    const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v11',
       center: this.amsterdamCoordinates,
       zoom: 12,
     })
+
+    map.addControl(new mapboxgl.NavigationControl())
   },
 })
 </script>
@@ -33,11 +35,16 @@ export default Vue.extend({
 <style scoped lang="scss">
 .map {
   position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-wrapper {
   width: 50%;
-  height: 50%;
-  margin-left: auto;
-  margin-right: auto;
-  left: 0;
-  right: 0;
+  padding-bottom: 35%;
+  position: relative;
+  left: 25%
 }
 </style>
