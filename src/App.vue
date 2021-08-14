@@ -11,8 +11,8 @@ import Map from './components/Map.vue'
 export default Vue.extend({
   name: 'App',
   components: {
-    Map
-  }
+    Map,
+  },
 })
 </script>
 
