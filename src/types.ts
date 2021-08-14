@@ -1,6 +1,6 @@
 import { LngLatLike } from 'mapbox-gl'
 
-export enum BirdNames {
+export enum BirdEnum {
   GIERZWALUW = 'Gierzwaluw',
   BOERENZWALUM = 'Boerenzwaluw',
   HUISZWALUM = 'Huiszwaluw',
@@ -14,6 +14,6 @@ export type Bird = {
   },
   id: number,
   properties: {
-    Vogel: BirdNames,
+    Vogel: BirdEnum,
   },
 }
