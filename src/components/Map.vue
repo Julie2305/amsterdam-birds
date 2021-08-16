@@ -38,21 +38,33 @@ export default Vue.extend({
   },
   async mounted () {
     mapboxgl.accessToken = this.accessToken
-    this.map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: this.amsterdamCoordinates,
-      zoom: 10,
+    Promise.all([this.fetchBirds(), this.loadMap()]).then(() => {
+      this.addMapLayers()
     })
-
-    this.fetchBirds().then(() => {
-      const data = this.birds
+    const navigation = new mapboxgl.NavigationControl()
+    this.map.addControl(navigation, 'top-left')
+  },
+  methods: {
+    ...mapActions(['fetchBirds', 'updateSelectedBirds']),
+    async loadMap () : Promise<void> {
+      return new Promise(resolve => {
+        this.map = new mapboxgl.Map({
+          container: 'map',
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: this.amsterdamCoordinates,
+          zoom: 10,
+        })
+        this.map.on('style.load', () => {
+          resolve()
+        })
+      })
+    },
+    addMapLayers () : void {
       this.map.on('load', () => {
         this.map.addSource('birds', {
           type: 'geojson',
-          data,
+          data: this.birds,
         })
-        console.log(this.birdsByType)
         this.birdsByType.forEach((bird: TypeOfBird) => {
           this.map.addLayer({
             id: bird.type,
@@ -63,7 +75,7 @@ export default Vue.extend({
               'circle-color': bird.color,
               'circle-stroke-color': 'white',
               'circle-stroke-width': 1,
-              'circle-opacity': 0.5,
+              // 'circle-opacity': 0.5,
             },
             filter: ['==', 'Vogel', bird.type],
             layout: {
@@ -72,12 +84,7 @@ export default Vue.extend({
           })
         })
       })
-    })
-    const navigation = new mapboxgl.NavigationControl()
-    this.map.addControl(navigation, 'top-left')
-  },
-  methods: {
-    ...mapActions(['fetchBirds', 'updateSelectedBirds']),
+    },
     birdChecked (event: Event) : void {
       const target = event.target as HTMLInputElement
       this.map.setLayoutProperty(
