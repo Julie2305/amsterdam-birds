@@ -52,6 +52,7 @@ export default Vue.extend({
           type: 'geojson',
           data,
         })
+        console.log(this.birdsByType)
         this.birdsByType.forEach((bird: TypeOfBird) => {
           this.map.addLayer({
             id: bird.type,
