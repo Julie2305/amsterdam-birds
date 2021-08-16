@@ -1,19 +1,19 @@
 <template>
   <div id="app">
     <Map />
-    <Birds />
+    <NumberOfBirds />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { Map, Birds } from './components'
+import { Map, NumberOfBirds } from './components'
 
 export default Vue.extend({
   name: 'App',
   components: {
     Map,
-    Birds,
+    NumberOfBirds,
   },
 })
 </script>

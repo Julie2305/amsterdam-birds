@@ -36,7 +36,7 @@ export default Vue.extend({
     },
   },
   mounted () {
-    this.fetchBirds()
+    // this.fetchBirds()
   },
   methods: {
     ...mapActions(['fetchBirds', 'updateSelectedBirds']),
@@ -45,11 +45,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.color-box {
-  margin-left: 5px;
-  width: 13px;
-  height: 13px;
-}
 .flex-box {
   display: flex;
   align-items: baseline;

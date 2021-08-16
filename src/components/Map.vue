@@ -2,16 +2,29 @@
 <div>
   <div class="map-wrapper">
     <div id="map" class="map"></div>
+    <nav id="filter-group" class="filter-group">
+      <div v-for="item in typeOfBirds" :key="item.type">
+        <input
+          type="checkbox"
+          :id="item.type"
+          :value="item.type"
+          @change="birdChecked($event)"
+        />
+        <label :for="item.type">{{ item.type }}</label>
+        <div :style="`background-color: ${item.color}`" class="color-box"></div>
+      </div>
+    </nav>
   </div>
 </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import mapboxgl, { LngLatLike } from 'mapbox-gl'
-import { Bird, BirdEnum } from '@/types'
-import { TypeOfBirds } from '@/constants'
+// import { Bird, BirdEnum } from '@/types'
+import { typeOfBirds } from '@/constants'
+// import { getBirds } from '@/api'
 
 export default Vue.extend({
   name: 'Map',
@@ -20,18 +33,19 @@ export default Vue.extend({
       map: Object as any,
       amsterdamCoordinates: [4.897070, 52.377956] as LngLatLike,
       accessToken: 'pk.eyJ1IjoianVsaWUtdCIsImEiOiJja3M3bmUwcHozajhlMnBzN3Jhd2xtcjFwIn0.LtJWuvdjFsdew2D2aEs18A',
-      markers: { ...TypeOfBirds },
+      markers: { ...typeOfBirds },
+      typeOfBirds: typeOfBirds,
     }
   },
-  watch: {
-    selectedBirds: function (newVal, oldVal) {
-      newVal.length < oldVal.length ? this.removeBird(this.latestChangedBird) : this.addBird(this.latestChangedBird)
-    },
-  },
+  // watch: {
+  //   selectedBirds: function (newVal, oldVal) {
+  //     newVal.length < oldVal.length ? this.removeBird(this.latestChangedBird) : this.addBird(this.latestChangedBird)
+  //   },
+  // },
   computed: {
-    ...mapState(['birdsByType', 'selectedBirds', 'latestChangedBird']),
+    ...mapState(['birds', 'birdsByType', 'selectedBirds', 'latestChangedBird']),
   },
-  mounted () {
+  async mounted () {
     mapboxgl.accessToken = this.accessToken
     this.map = new mapboxgl.Map({
       container: 'map',
@@ -40,24 +54,52 @@ export default Vue.extend({
       zoom: 10,
     })
 
-    this.map.addControl(new mapboxgl.NavigationControl())
+    await this.fetchBirds().then(() => {
+      const data = this.birds
+      this.map.on('load', () => {
+        this.map.addSource('birds', {
+          type: 'geojson',
+          data,
+        })
+        typeOfBirds.forEach(bird => {
+          this.map.addLayer({
+            id: bird.type,
+            type: 'circle',
+            source: 'birds',
+            paint: {
+              'circle-radius': 5,
+              'circle-color': bird.color,
+              'circle-stroke-color': 'white',
+              'circle-stroke-width': 1,
+              'circle-opacity': 0.5,
+            },
+            filter: ['==', 'Vogel', bird.type],
+            layout: {
+              visibility: 'none',
+            },
+          })
+        })
+      })
+    })
+    const navigation = new mapboxgl.NavigationControl()
+    this.map.addControl(navigation, 'top-left')
   },
   methods: {
-    addBird (addedBird: BirdEnum) : void {
-      this.markers[addedBird].markers = this.birdsByType[addedBird].birds.map((bird: Bird) => {
-        return new mapboxgl.Marker({ color: this.birdsByType[addedBird].color })
-          .setLngLat(bird.geometry.coordinates)
-          .addTo(this.map) as mapboxgl.Marker
-      })
-    },
-    removeBird (removedBird: BirdEnum) : void {
-      this.markers[removedBird].markers.forEach(marker => marker.remove())
+    ...mapActions(['fetchBirds', 'updateSelectedBirds']),
+    birdChecked (event: Event) : void {
+      const target = event.target as HTMLInputElement
+      this.map.setLayoutProperty(
+        target.value,
+        'visibility',
+        target.checked ? 'visible' : 'none',
+      )
+      this.updateSelectedBirds(target)
     },
   },
 })
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .map {
   position: absolute;
   top: 0;
@@ -72,4 +114,21 @@ export default Vue.extend({
   position: relative;
   left: 25%
 }
+.filter-group {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  width: 180px;
+  color: #fff;
+  background-color: #3386c0;
+}
+
+.color-box {
+  margin-left: 5px;
+  width: 13px;
+  height: 13px;
+  display: inline-block;
+}
+
 </style>

@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getBirds } from '@/api'
-import { Bird, BirdEnum } from '@/types'
-import { TypeOfBirds } from '@/constants'
+import { TypeOfBird, BirdEnum, Bird, BirdResponse } from '@/types'
+import { typeOfBirds } from '@/constants'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     fetchingBirds: false,
-    birds: [] as Array<Bird>,
+    birds: {} as BirdResponse,
     fetchBirdsFailed: false,
-    birdsByType: TypeOfBirds,
+    birdsByType: typeOfBirds,
     selectedBirds: [] as Array<BirdEnum>,
     latestChangedBird: '' as BirdEnum,
   },
@@ -20,14 +20,13 @@ export default new Vuex.Store({
       state.fetchBirdsFailed = false
       state.fetchingBirds = true
     },
-    fetchBirdsSucceeded (state, birds: Array<Bird>) {
+    fetchBirdsSucceeded (state, birds: BirdResponse) {
       state.fetchingBirds = false
       state.birds = birds
-      birds.forEach(bird => {
-        if (bird.properties.Vogel in state.birdsByType) {
-          state.birdsByType[bird.properties.Vogel].birds.push(bird)
-        } else {
-          state.birdsByType.Overig.birds.push(bird)
+      birds.features.forEach(bird => {
+        const knownType = state.birdsByType.find(birdType => birdType.type === bird.properties.Vogel)
+        if (knownType) {
+          knownType.birds.push(bird)
         }
       })
     },
@@ -47,14 +46,13 @@ export default new Vuex.Store({
   actions: {
     async fetchBirds ({ commit }): Promise<void> {
       commit('fetchBirdsStarted')
-      getBirds().then((birds) => {
+      return getBirds().then((birds) => {
         commit('fetchBirdsSucceeded', birds)
       }).catch(() => {
         commit('fetchBirdsFailed')
       })
     },
-    updateSelectedBirds ({ commit }, event: Event): void {
-      const target = event.target as HTMLInputElement
+    updateSelectedBirds ({ commit }, target: HTMLInputElement): void {
       target.checked ? commit('birdAdded', target.value) : commit('birdRemoved', target.value)
     },
   },

@@ -18,3 +18,14 @@ export type Bird = {
     Vogel: BirdEnum,
   },
 }
+
+export type BirdResponse = {
+  features: Array<Bird>,
+}
+
+export type TypeOfBird = {
+  type: BirdEnum,
+  color: String,
+  icon: String,
+  birds: Array<Bird>,
+}

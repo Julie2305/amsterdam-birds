@@ -1,10 +1,6 @@
-import { Bird } from '@/types'
+import { BirdResponse } from '@/types'
 
-type Response = {
-  features: Array<Bird>,
-}
-
-const getBirds = async (): Promise<Array<Bird>> => {
+const getBirds = async (): Promise<BirdResponse> => {
   return fetch('https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=VOGELS&THEMA=vogels', {
     method: 'GET',
     headers: {
@@ -13,9 +9,8 @@ const getBirds = async (): Promise<Array<Bird>> => {
     },
   })
     .then(response => response.json())
-    .then((json: Response) => {
-      console.log(json)
-      return json.features
+    .then((json: BirdResponse) => {
+      return json
     })
 }
 
