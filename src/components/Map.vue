@@ -10,7 +10,8 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import mapboxgl, { LngLatLike } from 'mapbox-gl'
-import { Bird } from '@/types'
+import { Bird, BirdEnum } from '@/types'
+import { TypeOfBirds } from '@/constants'
 
 export default Vue.extend({
   name: 'Map',
@@ -19,19 +20,16 @@ export default Vue.extend({
       map: Object as any,
       amsterdamCoordinates: [4.897070, 52.377956] as LngLatLike,
       accessToken: 'pk.eyJ1IjoianVsaWUtdCIsImEiOiJja3M3bmUwcHozajhlMnBzN3Jhd2xtcjFwIn0.LtJWuvdjFsdew2D2aEs18A',
+      markers: { ...TypeOfBirds },
     }
   },
   watch: {
-    selectedBird: function (val) {
-      this.birdsByType[val].birds.forEach((bird: Bird) => {
-        new mapboxgl.Marker({ color: this.birdsByType[val].color })
-          .setLngLat(bird.geometry.coordinates)
-          .addTo(this.map)
-      })
+    selectedBirds: function (newVal, oldVal) {
+      newVal.length < oldVal.length ? this.removeBird(this.latestChangedBird) : this.addBird(this.latestChangedBird)
     },
   },
   computed: {
-    ...mapState(['birds', 'birdsByType', 'selectedBird']),
+    ...mapState(['birdsByType', 'selectedBirds', 'latestChangedBird']),
   },
   mounted () {
     mapboxgl.accessToken = this.accessToken
@@ -39,10 +37,22 @@ export default Vue.extend({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v11',
       center: this.amsterdamCoordinates,
-      zoom: 12,
+      zoom: 10,
     })
 
     this.map.addControl(new mapboxgl.NavigationControl())
+  },
+  methods: {
+    addBird (addedBird: BirdEnum) : void {
+      this.markers[addedBird].markers = this.birdsByType[addedBird].birds.map((bird: Bird) => {
+        return new mapboxgl.Marker({ color: this.birdsByType[addedBird].color })
+          .setLngLat(bird.geometry.coordinates)
+          .addTo(this.map) as mapboxgl.Marker
+      })
+    },
+    removeBird (removedBird: BirdEnum) : void {
+      this.markers[removedBird].markers.forEach(marker => marker.remove())
+    },
   },
 })
 </script>

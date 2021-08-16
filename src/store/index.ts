@@ -11,9 +11,9 @@ export default new Vuex.Store({
     fetchingBirds: false,
     birds: [] as Array<Bird>,
     fetchBirdsFailed: false,
-    // typeOfBirds: TypeOfBirds,
     birdsByType: TypeOfBirds,
-    selectedBird: '', // type!!
+    selectedBirds: [] as Array<BirdEnum>,
+    latestChangedBird: '' as BirdEnum,
   },
   mutations: {
     fetchBirdsStarted (state) {
@@ -35,8 +35,13 @@ export default new Vuex.Store({
       state.fetchingBirds = false
       state.fetchBirdsFailed = true
     },
-    selectionUpdated (state, value) {
-      state.selectedBird = value
+    birdAdded (state, addedBird: BirdEnum) {
+      state.latestChangedBird = addedBird
+      state.selectedBirds.push(addedBird)
+    },
+    birdRemoved (state, removedBird: BirdEnum) {
+      state.latestChangedBird = removedBird
+      state.selectedBirds = state.selectedBirds.filter((selectedBird) => selectedBird !== removedBird)
     },
   },
   actions: {
@@ -47,6 +52,10 @@ export default new Vuex.Store({
       }).catch(() => {
         commit('fetchBirdsFailed')
       })
+    },
+    updateSelectedBirds ({ commit }, event: Event): void {
+      const target = event.target as HTMLInputElement
+      target.checked ? commit('birdAdded', target.value) : commit('birdRemoved', target.value)
     },
   },
 })

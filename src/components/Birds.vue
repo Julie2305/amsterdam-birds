@@ -5,44 +5,41 @@
   <div v-else>
     <div v-for="(item, name) in birdsByType" :key=name class="flex-box">
       <input
-        type="radio"
+        type="checkbox"
         :id="name"
-        name="birds"
-        v-model="selected"
-        v-bind:value="name"
+        :value="name"
+        @change="updateSelectedBirds($event)"
       />
       <label :for="name">{{ name }} ( {{ item.birds.length }} )</label>
       <div :style="`background-color: ${item.color}`" class="color-box"></div>
     </div>
-    <input type="radio" id="total-birds" name="birds"/>
-    <label for="total-birds">Alle vogels {{ `${birds.length}` }} </label>
   </div>
+  <p> Totaal aantal getoonde volgels: {{ totalSelectedBirds }}</p>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
-import { Bird, BirdEnum } from '@/types'
+import { BirdEnum } from '@/types'
 
 export default Vue.extend({
   name: 'Birds',
   computed: {
-    ...mapState(['birds', 'typeOfBirds', 'fetchingBirds', 'fetchBirdsFailed', 'birdsByType', 'selectedBird']),
-    selected: {
-      get (): Bird {
-        return this.selectedBird
-      },
-      set (value: BirdEnum): void {
-        this.$store.commit('selectionUpdated', value)
-      },
+    ...mapState(['fetchingBirds', 'fetchBirdsFailed', 'birdsByType', 'selectedBirds']),
+    totalSelectedBirds () : number {
+      let number = 0
+      this.selectedBirds.forEach((bird: BirdEnum) => {
+        number = number + this.birdsByType[bird].birds.length
+      })
+      return number
     },
   },
   mounted () {
     this.fetchBirds()
   },
   methods: {
-    ...mapActions(['fetchBirds']),
+    ...mapActions(['fetchBirds', 'updateSelectedBirds']),
   },
 })
 </script>
