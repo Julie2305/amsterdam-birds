@@ -21,17 +21,19 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue'
 import { mapActions, mapState } from 'vuex'
+import { Bird, BirdEnum } from '@/types'
 
-export default {
+export default Vue.extend({
   name: 'Birds',
   computed: {
     ...mapState(['birds', 'typeOfBirds', 'fetchingBirds', 'fetchBirdsFailed', 'birdsByType', 'selectedBird']),
     selected: {
-      get () {
+      get (): Bird {
         return this.selectedBird
       },
-      set (value) {
+      set (value: BirdEnum): void {
         this.$store.commit('selectionUpdated', value)
       },
     },
@@ -42,7 +44,7 @@ export default {
   methods: {
     ...mapActions(['fetchBirds']),
   },
-}
+})
 </script>
 
 <style lang="scss">
