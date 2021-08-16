@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { getBirds } from '@/api'
-import { TypeOfBird, BirdEnum, Bird, BirdResponse } from '@/types'
+import { BirdEnum, BirdResponse } from '@/types'
 import { typeOfBirds } from '@/constants'
 
 Vue.use(Vuex)
@@ -13,7 +13,6 @@ export default new Vuex.Store({
     fetchBirdsFailed: false,
     birdsByType: typeOfBirds,
     selectedBirds: [] as Array<BirdEnum>,
-    latestChangedBird: '' as BirdEnum,
   },
   mutations: {
     fetchBirdsStarted (state) {
@@ -35,11 +34,9 @@ export default new Vuex.Store({
       state.fetchBirdsFailed = true
     },
     birdAdded (state, addedBird: BirdEnum) {
-      state.latestChangedBird = addedBird
       state.selectedBirds.push(addedBird)
     },
     birdRemoved (state, removedBird: BirdEnum) {
-      state.latestChangedBird = removedBird
       state.selectedBirds = state.selectedBirds.filter((selectedBird) => selectedBird !== removedBird)
     },
   },

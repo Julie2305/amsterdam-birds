@@ -60,28 +60,25 @@ export default Vue.extend({
       })
     },
     addMapLayers () : void {
-      this.map.on('load', () => {
-        this.map.addSource('birds', {
-          type: 'geojson',
-          data: this.birds,
-        })
-        this.birdsByType.forEach((bird: TypeOfBird) => {
-          this.map.addLayer({
-            id: bird.type,
-            type: 'circle',
-            source: 'birds',
-            paint: {
-              'circle-radius': 5,
-              'circle-color': bird.color,
-              'circle-stroke-color': 'white',
-              'circle-stroke-width': 1,
-              // 'circle-opacity': 0.5,
-            },
-            filter: ['==', 'Vogel', bird.type],
-            layout: {
-              visibility: 'none',
-            },
-          })
+      this.map.addSource('birds', {
+        type: 'geojson',
+        data: this.birds,
+      })
+      this.birdsByType.forEach((bird: TypeOfBird) => {
+        this.map.addLayer({
+          id: bird.type,
+          type: 'circle',
+          source: 'birds',
+          paint: {
+            'circle-radius': 5,
+            'circle-color': bird.color,
+            'circle-stroke-color': 'white',
+            'circle-stroke-width': 1,
+          },
+          filter: ['==', 'Vogel', bird.type],
+          layout: {
+            visibility: 'none',
+          },
         })
       })
     },
