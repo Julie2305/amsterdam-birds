@@ -2,7 +2,7 @@
 <div>
   <div class="map-wrapper">
     <div id="map" class="map"></div>
-    <nav id="filter-group" class="filter-group">
+    <nav id="filter-group" class="filter-group" v-if="birds.features && birds.features.length > 0">
       <div v-for="item in birdsByType" :key="item.type">
         <input
           type="checkbox"
