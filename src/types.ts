@@ -26,6 +26,5 @@ export type BirdResponse = {
 export type TypeOfBird = {
   type: BirdEnum,
   color: String,
-  icon: String,
   birds: Array<Bird>,
 }

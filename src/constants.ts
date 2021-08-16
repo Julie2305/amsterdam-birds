@@ -11,15 +11,15 @@ export const typeOfBirds = [
     birds: [] as Array<Bird>,
   }, {
     type: 'Huiszwaluw',
-    color: '#FEFA00',
+    color: '#1B7305',
     birds: [] as Array<Bird>,
   }, {
     type: 'Huismus',
-    color: '#14C806',
+    color: '#0641C8',
     birds: [] as Array<Bird>,
   }, {
     type: 'Spreeuw',
-    color: '#0641C8',
+    color: '#E300C1',
     birds: [] as Array<Bird>,
   },
 ]
